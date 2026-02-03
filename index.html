@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz</title>
+    <title>Quiz App - AI Generated & File Upload</title>
     <style>
         * {
             margin: 0;
@@ -40,6 +40,150 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
         }
         
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover {
+            background: #e9ecef;
+            color: #1a2a6c;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: #1a2a6c;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* AI Generation Form */
+        .ai-form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1a2a6c;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(90deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+            margin-top: 10px;
+        }
+        
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.6);
+        }
+        
+        .generate-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            color: #3498db;
+            font-size: 16px;
+        }
+        
+        .loading-spinner.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #fee;
+            border: 2px solid #fcc;
+            color: #c33;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .error-message.active {
+            display: block;
+        }
+        
+        /* Upload Section */
         .header-container {
             display: flex;
             justify-content: space-between;
@@ -133,7 +277,7 @@
         }
         
         .question-column {
-            flex: 3; /* 75% width */
+            flex: 3;
             padding-right: 12px;
             border-right: 2px solid #e0e0e0;
             max-height: 78vh;
@@ -141,7 +285,7 @@
         }
         
         .feedback-column {
-            flex: 1; /* 25% width */
+            flex: 1;
             padding-left: 12px;
             min-height: 350px;
             display: flex;
@@ -214,334 +358,320 @@
         }
         
         .btn {
-            padding: 10px 25px;
+            padding: 10px 28px;
             border: none;
-            border-radius: 22px;
+            border-radius: 6px;
+            cursor: pointer;
             font-size: 15px;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s;
-            min-width: 140px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
         }
         
-        .submit-btn {
-            background: linear-gradient(90deg, #27ae60 0%, #219653 100%);
+        .btn-primary {
+            background: linear-gradient(90deg, #28a745 0%, #218838 100%);
             color: white;
+            box-shadow: 0 3px 8px rgba(40, 167, 69, 0.4);
         }
         
-        .submit-btn:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.4);
+            box-shadow: 0 5px 10px rgba(40, 167, 69, 0.5);
         }
         
-        .next-btn {
-            background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+        .btn-secondary {
+            background: linear-gradient(90deg, #007bff 0%, #0056b3 100%);
             color: white;
+            box-shadow: 0 3px 8px rgba(0, 123, 255, 0.4);
         }
         
-        .next-btn:hover {
+        .btn-secondary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+            box-shadow: 0 5px 10px rgba(0, 123, 255, 0.5);
         }
         
         .btn:disabled {
-            opacity: 0.65;
+            background: #95a5a6;
             cursor: not-allowed;
-            transform: none;
             box-shadow: none;
         }
         
         .feedback {
-            font-size: 22px;
+            font-size: 30px;
             font-weight: bold;
-            margin-bottom: 18px;
-            min-height: 32px;
-            padding: 6px 12px;
+            padding: 18px;
             border-radius: 10px;
-            width: 100%;
+            margin-bottom: 18px;
+            display: none;
         }
         
         .feedback.correct {
+            color: #28a745;
             background: #d4edda;
-            color: #155724;
-            border: 2px solid #c3e6cb;
+            border: 2px solid #28a745;
         }
         
         .feedback.wrong {
+            color: #dc3545;
             background: #f8d7da;
-            color: #721c24;
-            border: 2px solid #f5c6cb;
+            border: 2px solid #dc3545;
         }
         
         .explanation {
+            background: #fff8dc;
             padding: 15px;
-            font-size: 15px;
-            line-height: 1.5;
-            min-height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: left;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 12px;
         }
         
         .explanation.hidden {
-            color: #667eea;
-            font-size: 16px;
-            font-weight: bold;
-            background: transparent;
+            display: none;
         }
         
-        .result-section {
-            display: none;
+        .result-container {
             text-align: center;
             padding: 20px;
         }
         
-        .result-score {
-            font-size: 50px;
+        .score-display {
+            font-size: 55px;
+            color: #1a2a6c;
             font-weight: bold;
-            background: linear-gradient(90deg, #27ae60 0%, #219653 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin: 15px 0;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 18px 0;
         }
         
         .result-message {
             font-size: 20px;
-            color: #2c3e50;
-            margin: 20px 0 30px;
-            line-height: 1.5;
-            font-weight: 500;
-        }
-        
-        .retry-btn {
-            background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%);
-            color: white;
-            padding: 11px 40px;
-            border: none;
-            border-radius: 25px;
-            font-size: 18px;
+            color: #28a745;
+            margin: 15px 0;
             font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(142, 68, 173, 0.4);
-        }
-        
-        .retry-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(142, 68, 173, 0.6);
         }
         
         .results-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 22px 0;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            border-radius: 6px;
-            overflow: hidden;
+            margin: 20px 0;
             font-size: 14px;
         }
         
         .results-table th {
             background: linear-gradient(90deg, #1a2a6c 0%, #2c3e50 100%);
             color: white;
-            padding: 12px 8px;
+            padding: 12px;
             text-align: left;
-            font-size: 15px;
         }
         
         .results-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: top;
-        }
-        
-        .results-table tr:last-child td {
-            border-bottom: none;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
         }
         
         .results-table tr:hover {
-            background-color: #f8f9ff;
+            background: #f8f9fa;
         }
         
         .status-correct {
-            background: #d4edda;
-            color: #155724;
+            color: #28a745;
             font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 12px;
-            display: inline-block;
-            font-size: 13px;
+            font-size: 14px;
         }
         
         .status-wrong {
-            background: #f8d7da;
-            color: #721c24;
+            color: #dc3545;
             font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 12px;
-            display: inline-block;
-            font-size: 13px;
+            font-size: 14px;
         }
         
         .user-answer {
-            background: #e3f2fd;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin: 3px 0;
-            font-weight: 500;
-            font-size: 13px;
+            background: #fff3cd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 3px;
+            font-size: 12px;
         }
         
         .correct-answer {
             background: #d4edda;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin: 3px 0;
-            font-weight: 500;
-            border-left: 2px solid #28a745;
-            font-size: 13px;
-        }
-        
-        .question-summary {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #1a2a6c;
-            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 3px;
+            font-size: 12px;
         }
         
         .answer-details {
             margin-top: 6px;
-            padding-top: 6px;
-            border-top: 1px dashed #ccc;
         }
         
-        .back-to-upload {
-            background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
-            color: white;
-            padding: 9px 22px;
-            border: none;
-            border-radius: 20px;
-            font-size: 15px;
-            margin-top: 15px;
-            cursor: pointer;
-            transition: all 0.25s;
+        .question-summary {
+            font-weight: 600;
+            color: #1a2a6c;
+            margin-bottom: 6px;
         }
         
-        .back-to-upload:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(231, 76, 60, 0.4);
+        .hidden {
+            display: none;
         }
         
-        @media (max-width: 900px) {
+        @media (max-width: 768px) {
             .quiz-container {
                 flex-direction: column;
             }
             
-            .question-column, .feedback-column {
+            .question-column {
                 border-right: none;
                 border-bottom: 2px solid #e0e0e0;
-                padding-right: 0;
-                padding-left: 0;
-                max-height: none;
+                padding-bottom: 15px;
             }
             
             .feedback-column {
-                min-height: auto;
-                padding: 12px;
-            }
-            
-            .header-container {
-                flex-direction: column;
-                gap: 8px;
-                align-items: flex-start;
+                padding-left: 0;
+                padding-top: 15px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Upload Section -->
-        <div class="upload-section" id="uploadSection">
-            <h1>Quiz of your choice</h1>
-            <p style="font-size: 15px; margin: 10px 0; color: #2c3e50;">Upload your questions file to begin</p>
-            <input type="file" id="fileInput" accept=".txt" style="display: none;">
-            <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-                📤 Upload Questions File
-            </button>
-            <div id="fileName" style="margin: 10px 0; font-size: 14px; color: #7f8c8d; min-height: 20px;">No file selected</div>
-            <button class="upload-btn" id="startBtn" disabled style="background: #95a5a6; cursor: not-allowed;">
-                Start Quiz
-            </button>
+        <h1>🎯 Quiz of your choice</h1>
+        
+        <!-- Setup Section -->
+        <div id="setupSection">
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchTab('ai')">🤖 AI Generate Quiz</button>
+                <button class="tab-btn" onclick="switchTab('upload')">📤 Upload Quiz File</button>
+            </div>
             
-            <div class="format-instructions">
-                <h3>📋 File Format Instructions</h3>
-                <pre><code>TIMER: 20 (comes only once at the top)</code>
-      The below one's gets repeated for each question
-      QUESTION: [Your question]
-A) [Option A]
-B) [Option B]
+            <!-- AI Generation Tab -->
+            <div id="aiTab" class="tab-content active">
+                <div class="ai-form">
+                    <div class="form-group">
+                        <label for="apiKey">
+						  🔑 
+						  <a href="https://enter.pollinations.ai/" 
+							 target="_blank" 
+							 title="Create an account using GitHub">
+							 Pollinations API Key
+						  </a>
+						</label>
+                        <input type="password" id="apiKey" placeholder="Enter your API key">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="topic">📚 Topic</label>
+                        <input type="text" id="topic" placeholder="e.g., AWS Cloud Computing, Python Programming">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="numQuestions">📝 Number of Questions</label>
+                        <input type="number" id="numQuestions" min="1" max="50" value="10" placeholder="Enter number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="difficulty">⚡ Difficulty Level</label>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="timer">⏱️ Timer Duration (minutes)</label>
+                        <input type="number" id="timer" min="1" max="180" value="10" placeholder="Enter minutes">
+                    </div>
+                    
+                    <button class="generate-btn" id="generateBtn" onclick="generateQuiz()">
+                        🚀 Generate Quiz with AI
+                    </button>
+                    
+                    <div class="loading-spinner" id="loadingSpinner">
+                        <div class="spinner"></div>
+                        <p>Generating your quiz... This may take a moment.</p>
+                    </div>
+                    
+                    <div class="error-message" id="errorMessage"></div>
+                </div>
+            </div>
+            
+            <!-- Upload Tab -->
+            <div id="uploadTab" class="tab-content">
+                <div class="upload-section">
+                    <input type="file" id="fileInput" accept=".txt" style="display: none;" onchange="handleFileSelect(event)">
+                    <label for="fileInput" class="upload-btn">📂 Choose Quiz File</label>
+                    <div id="fileName" style="margin-top: 10px; color: #666;">No file selected</div>
+                    <button class="upload-btn" id="startBtn" onclick="startQuiz()" disabled style="background: #95a5a6; cursor: not-allowed;">
+                        ▶️ Start Quiz
+                    </button>
+                    
+                    <div class="format-instructions">
+                        <h3>📋 Quiz File Format</h3>
+                        <p>Your text file should follow this exact format:</p>
+                        <pre>TIMER: 10 (comes only once at the top, change the timer of your choice in mins)
+The below one's gets repeated for each question
+QUESTION: What is AWS?
+A) A cloud platform
+B) A database
+C) A Website
 TYPE: SINGLE or MULTIPLE
-ANSWER: [Letter(s)] example A B C (without comma, just a space between them)
-EXPLANATION: [Explanation]
+ANSWER: A B C D(without comma, just a space)
+EXPLANATION: AWS is Amazon's cloud platform.
 ===END===</pre>
+                    </div>
+                </div>
             </div>
         </div>
         
         <!-- Quiz Section -->
-        <div class="quiz-section" id="quizSection" style="display: none;">
+        <div id="quizSection" class="hidden">
             <div class="header-container">
-                <div class="timer-display" id="timerDisplay">20:00</div>
-                <div class="progress-text" id="progressText">Question 1 of 10</div>
+                <div id="timerDisplay" class="timer-display">⏰ Time: 10:00</div>
+                <div id="progressText" class="progress-text">Question 1 of 10</div>
             </div>
             
             <div class="quiz-container">
                 <div class="question-column">
-                    <div class="question-text" id="questionText">Loading question...</div>
-                    <div class="options-container" id="optionsContainer">
-                        <!-- Options will be inserted here -->
-                    </div>
+                    <div id="questionText" class="question-text">Question will appear here</div>
+                    <div id="optionsContainer" class="options-container"></div>
                     <div class="controls">
-                        <button class="btn submit-btn" id="submitBtn">Submit ✅</button>
-                        <button class="btn next-btn" id="nextBtn" disabled>Next ➡️</button>
+                        <button class="btn btn-primary" id="submitBtn">✅ Submit Answer</button>
+                        <button class="btn btn-secondary" id="nextBtn" disabled>➡️ Next Question</button>
                     </div>
                 </div>
                 
                 <div class="feedback-column">
-                    <div class="feedback" id="feedback" style="display: none;"></div>
-                    <div class="explanation hidden" id="explanation">💡 Submit to see explanation...</div>
+                    <div id="feedback" class="feedback"></div>
+                    <div id="explanation" class="explanation hidden">💡 Submit to see explanation...</div>
                 </div>
             </div>
         </div>
         
         <!-- Result Section -->
-        <div class="result-section" id="resultSection" style="display: none;">
-            <h1>🎉 Quiz Completed!</h1>
-            <div class="result-score" id="scoreDisplay">0/0</div>
-            <div class="result-message" id="resultMessage"></div>
-            
-            <h2 style="margin: 22px 0 15px; color: #1a2a6c; font-size: 20px;">📝 Detailed Results</h2>
-            <div style="max-height: 420px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px; padding: 10px; background: #f8f9ff;">
+        <div id="resultSection" class="hidden">
+            <div class="result-container">
+                <h2 style="color: #1a2a6c; margin-bottom: 15px;">🎉 Quiz Completed!</h2>
+                <div class="score-display" id="scoreDisplay">0/0</div>
+                <div class="result-message" id="resultMessage"></div>
+                
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Q#</th>
-                            <th>Question & Your Answer</th>
-                            <th>Result</th>
+                            <th style="width: 50px;">Q#</th>
+                            <th>Details</th>
+                            <th style="width: 120px;">Result</th>
                         </tr>
                     </thead>
-                    <tbody id="resultsBody">
-                        <!-- Results will be inserted here -->
-                    </tbody>
+                    <tbody id="resultsBody"></tbody>
                 </table>
+                
+                <div class="controls">
+                    <button class="btn btn-primary" id="retryBtn">🔄 Retry Quiz</button>
+                    <button class="btn btn-secondary" id="backToUpload">🏠 Back to Setup</button>
+                </div>
             </div>
-            
-            <button class="retry-btn" id="retryBtn">🔄 Take Quiz Again</button>
-            <button class="back-to-upload" id="backToUpload">🏠 Back to Upload</button>
         </div>
     </div>
 
@@ -549,122 +679,237 @@ EXPLANATION: [Explanation]
         let questions = [];
         let currentQuestionIndex = 0;
         let score = 0;
-        let timerDuration = 20;
-        let timeRemaining = 0;
-        let timerInterval = null;
-        let userAnswers = [];
+        let timerInterval;
+        let userAnswers = {};
         
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('fileName').textContent = `✅ ${file.name}`;
-                document.getElementById('startBtn').disabled = false;
-                document.getElementById('startBtn').style.background = 'linear-gradient(90deg, #27ae60 0%, #219653 100%)';
-                document.getElementById('startBtn').style.cursor = 'pointer';
-                document.getElementById('startBtn').onclick = () => startQuiz(file);
-            }
-        });
-        
-        function parseQuestions(content) {
-            const lines = content.split('\n');
-            let timerLine = lines[0].trim();
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
-            if (timerLine.startsWith('TIMER:')) {
-                const timerValue = timerLine.replace('TIMER:', '').trim();
-                timerDuration = parseInt(timerValue) || 20;
-                timeRemaining = timerDuration * 60;
-                content = content.replace(timerLine + '\n', '');
+            if (tab === 'ai') {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+                document.getElementById('aiTab').classList.add('active');
             } else {
-                timeRemaining = timerDuration * 60;
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+                document.getElementById('uploadTab').classList.add('active');
             }
-            
-            const blocks = content.split('===END===');
-            const parsedQuestions = [];
-            
-            blocks.forEach(block => {
-                if (block.trim() === '') return;
-                
-                const qLines = block.split('\n').filter(line => line.trim() !== '');
-                let question = '';
-                const options = {};
-                let answer = '';
-                let explanation = '';
-                let type = 'SINGLE';
-                
-                qLines.forEach(line => {
-                    if (line.startsWith('QUESTION:')) {
-                        question = line.replace('QUESTION:', '').trim();
-                    } else if (/^[A-F]\)/.test(line)) {
-                        const match = line.match(/^([A-F])\)(.*)/);
-                        if (match) {
-                            options[match[1]] = match[2].trim();
-                        }
-                    } else if (line.startsWith('TYPE:')) {
-                        type = line.replace('TYPE:', '').trim().toUpperCase();
-                    } else if (line.startsWith('ANSWER:')) {
-                        answer = line.replace('ANSWER:', '').trim();
-                    } else if (line.startsWith('EXPLANATION:')) {
-                        explanation = line.replace('EXPLANATION:', '').trim();
-                    }
-                });
-                
-                if (question && Object.keys(options).length > 0 && answer) {
-                    parsedQuestions.push({
-                        question,
-                        options,
-                        answer,
-                        explanation,
-                        type,
-                        userAnswer: null,
-                        isCorrect: null
-                    });
-                }
-            });
-            
-            return parsedQuestions;
         }
         
-        function startQuiz(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                questions = parseQuestions(e.target.result);
-                if (questions.length === 0) {
-                    alert('No valid questions found! Check your file format.');
-                    return;
+        async function generateQuiz() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const topic = document.getElementById('topic').value.trim();
+            const numQuestions = document.getElementById('numQuestions').value;
+            const difficulty = document.getElementById('difficulty').value;
+            const timer = document.getElementById('timer').value;
+            
+            // Validation
+            if (!apiKey) {
+                showError('Please enter your API key');
+                return;
+            }
+            if (!topic) {
+                showError('Please enter a topic');
+                return;
+            }
+            if (!numQuestions || numQuestions < 1) {
+                showError('Please enter a valid number of questions');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loadingSpinner').classList.add('active');
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('errorMessage').classList.remove('active');
+            
+            try {
+                const systemPrompt = `You are a helpful assistant that creates quizzes based on the given topic. 
+Give the quiz in this EXACT format:
+TIMER: ${timer}
+QUESTION: [Your question]
+A) [Option A]
+B) [Option B]
+C) [Option C]
+D) [Option D]
+TYPE: SINGLE or MULTIPLE
+ANSWER: [Letter(s)] example A B C (without comma, just a space between them)
+EXPLANATION: [Explanation]
+===END===
+
+Important rules:
+- Start with TIMER line ONLY ONCE at the beginning
+- Each question must have exactly 4 options (A, B, C, D)
+- TYPE must be either SINGLE or MULTIPLE
+- For SINGLE type, ANSWER should be one letter
+- For MULTIPLE type, ANSWER should be letters separated by spaces
+- End each question with ===END===
+- Make questions relevant to ${topic} at ${difficulty} level`;
+
+                const prompt = `Give me ${numQuestions} quiz questions on ${topic} with difficulty level ${difficulty}`;
+                
+                // Use Claude Sonnet 4.5 for better reasoning
+                const url = `https://gen.pollinations.ai/text/${encodeURIComponent(prompt)}`;
+                const params = new URLSearchParams({
+                    model: 'openai-fast',
+                    key: apiKey,
+                    system: systemPrompt,
+                });
+                
+                const response = await fetch(`${url}?${params.toString()}`);
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
                 }
                 
-                currentQuestionIndex = 0;
-                score = 0;
-                userAnswers = new Array(questions.length).fill(null);
+                const quizText = await response.text();
                 
+                // Parse the generated quiz
+                parseQuizContent(quizText);
+                
+                if (questions.length === 0) {
+                    throw new Error('No questions were generated. Please try again.');
+                }
+                
+                // Hide loading and start quiz
+                document.getElementById('loadingSpinner').classList.remove('active');
+                document.getElementById('generateBtn').disabled = false;
+                
+                // Start the quiz
+                document.getElementById('setupSection').style.display = 'none';
+                document.getElementById('quizSection').classList.remove('hidden');
+                loadQuestion(0);
                 startTimer();
                 
-                document.getElementById('uploadSection').style.display = 'none';
-                document.getElementById('quizSection').style.display = 'block';
-                loadQuestion(currentQuestionIndex);
-            };
-            reader.readAsText(file);
+            } catch (error) {
+                console.error('Error generating quiz:', error);
+                showError(`Failed to generate quiz: ${error.message}`);
+                document.getElementById('loadingSpinner').classList.remove('active');
+                document.getElementById('generateBtn').disabled = false;
+            }
+        }
+        
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = `❌ ${message}`;
+            errorEl.classList.add('active');
+            setTimeout(() => errorEl.classList.remove('active'), 5000);
+        }
+        
+        function parseQuizContent(content) {
+            questions = [];
+            const lines = content.split('\n').filter(line => line.trim());
+            
+            let currentQuestion = null;
+            let timerValue = 10;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (line.startsWith('TIMER:')) {
+                    timerValue = parseInt(line.split(':')[1].trim()) || 10;
+                } else if (line.startsWith('QUESTION:')) {
+                    if (currentQuestion) {
+                        questions.push(currentQuestion);
+                    }
+                    currentQuestion = {
+                        question: line.substring(9).trim(),
+                        options: {},
+                        type: 'SINGLE',
+                        answer: '',
+                        explanation: '',
+                        userAnswer: null,
+                        isCorrect: false
+                    };
+                } else if (line.match(/^[A-D]\)/)) {
+                    if (currentQuestion) {
+                        const optionKey = line.charAt(0);
+                        const optionValue = line.substring(2).trim();
+                        currentQuestion.options[optionKey] = optionValue;
+                    }
+                } else if (line.startsWith('TYPE:')) {
+                    if (currentQuestion) {
+                        currentQuestion.type = line.substring(5).trim();
+                    }
+                } else if (line.startsWith('ANSWER:')) {
+                    if (currentQuestion) {
+                        currentQuestion.answer = line.substring(7).trim();
+                    }
+                } else if (line.startsWith('EXPLANATION:')) {
+                    if (currentQuestion) {
+                        currentQuestion.explanation = line.substring(12).trim();
+                    }
+                } else if (line === '===END===') {
+                    if (currentQuestion) {
+                        questions.push(currentQuestion);
+                        currentQuestion = null;
+                    }
+                }
+            }
+            
+            if (currentQuestion) {
+                questions.push(currentQuestion);
+            }
+            
+            // Set timer
+            if (timerValue > 0) {
+                window.quizTimerMinutes = timerValue;
+            }
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    parseQuizContent(content);
+                    
+                    if (questions.length > 0) {
+                        document.getElementById('startBtn').disabled = false;
+                        document.getElementById('startBtn').style.background = 'linear-gradient(90deg, #3498db 0%, #2c3e50 100%)';
+                        document.getElementById('startBtn').style.cursor = 'pointer';
+                    } else {
+                        alert('❌ No valid questions found in file. Please check the format.');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+        
+        function startQuiz() {
+            if (questions.length === 0) {
+                alert('⚠️ Please upload a valid quiz file first!');
+                return;
+            }
+            
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('quizSection').classList.remove('hidden');
+            loadQuestion(0);
+            startTimer();
         }
         
         function startTimer() {
-            updateTimerDisplay();
+            const timerMinutes = window.quizTimerMinutes || 10;
+            let timeLeft = timerMinutes * 60;
+            
             timerInterval = setInterval(() => {
-                timeRemaining--;
-                if (timeRemaining <= 0) {
-                    clearInterval(timerInterval);
-                    autoSubmitQuiz();
-                } else if (timeRemaining <= 60) {
+                timeLeft--;
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('timerDisplay').textContent = 
+                    `⏰ Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 60) {
                     document.getElementById('timerDisplay').classList.add('timer-warning');
                 }
-                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert('⏰ Time\'s up!');
+                    autoSubmitQuiz();
+                }
             }, 1000);
-        }
-        
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeRemaining / 60);
-            const seconds = timeRemaining % 60;
-            document.getElementById('timerDisplay').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
         
         function autoSubmitQuiz() {
@@ -797,20 +1042,20 @@ EXPLANATION: [Explanation]
         
         function showResults() {
             clearInterval(timerInterval);
-            document.getElementById('quizSection').style.display = 'none';
-            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('quizSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
             document.getElementById('scoreDisplay').textContent = `${score}/${questions.length}`;
             
             const percentage = (score / questions.length) * 100;
             let message = '';
             if (percentage === 100) {
-                message = '🏆 AWS Pro! Tony Stark would hire you!';
+                message = '🏆 Perfect Score! Outstanding!';
             } else if (percentage >= 80) {
-                message = '🎉 Excellent! Ready for the real exam!';
+                message = '🎉 Excellent! Great job!';
             } else if (percentage >= 60) {
                 message = '👍 Good effort! Keep practicing!';
             } else if (percentage >= 40) {
-                message = '📚 Needs work. Don\'t worry - keep trying!';
+                message = '📚 Needs work. Keep learning!';
             } else {
                 message = '💪 Don\'t give up! Practice makes perfect!';
             }
@@ -854,28 +1099,27 @@ EXPLANATION: [Explanation]
         
         document.getElementById('retryBtn').addEventListener('click', function() {
             resetQuiz();
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('quizSection').classList.remove('hidden');
+            loadQuestion(0);
+            startTimer();
         });
         
         document.getElementById('backToUpload').addEventListener('click', function() {
             resetQuiz();
-            document.getElementById('resultSection').style.display = 'none';
-            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('setupSection').style.display = 'block';
         });
         
         function resetQuiz() {
             clearInterval(timerInterval);
             currentQuestionIndex = 0;
             score = 0;
-            questions = [];
-            document.getElementById('fileInput').value = '';
-            document.getElementById('fileName').textContent = 'No file selected';
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('startBtn').style.background = '#95a5a6';
-            document.getElementById('startBtn').style.cursor = 'not-allowed';
+            questions.forEach(q => {
+                q.userAnswer = null;
+                q.isCorrect = false;
+            });
         }
     </script>
 </body>
-
 </html>
-
-
