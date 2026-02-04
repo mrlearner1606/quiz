@@ -675,7 +675,8 @@
                             🌸 Bring Your Own Pollen (BYOP)
                         </div>
                         <div class="byop-description">
-                            Pay for your own AI usage. No server costs. Self-regulating and secure.
+                            Pay for your own AI usage. No server costs. Self-regulating and secure.<br>
+                            <small style="opacity: 0.8;">Default: 10 pollen budget, 30-day expiry</small>
                         </div>
                         <button class="byop-connect-btn" id="byopConnectBtn" onclick="connectWithPollinations()">
                             🔗 Connect with Pollinations
@@ -826,6 +827,7 @@ EXPLANATION: AWS is Amazon's cloud platform.
         // BYOP Authentication Functions
         function connectWithPollinations() {
             const currentUrl = window.location.href.split('#')[0]; // Remove any existing hash
+            // Note: Budget is set to 10 pollen units. Users can manage their budget from the Pollinations dashboard.
             const authUrl = `https://enter.pollinations.ai/authorize?redirect_url=${encodeURIComponent(currentUrl)}&permissions=profile,balance&models=openai,flux&expiry=30&budget=10`;
             window.location.href = authUrl;
         }
@@ -885,15 +887,15 @@ EXPLANATION: AWS is Amazon's cloud platform.
                 // Show connected status
                 statusDiv.style.display = 'block';
                 statusDiv.classList.add('connected');
-                const maskedKey = apiKey.substring(0, 8) + '...' + apiKey.substring(apiKey.length - 4);
+                const maskedKey = apiKey.substring(0, 6) + '...' + apiKey.substring(apiKey.length - 4);
                 statusText.innerHTML = `
                     ✅ Connected with key: <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-size: 11px;">${maskedKey}</code>
                     <button class="byop-disconnect-btn" onclick="disconnectBYOP()">Disconnect</button>
                 `;
                 connectBtn.textContent = '🔗 Reconnect';
                 
-                // Auto-fill the API key field (hidden)
-                document.getElementById('apiKey').value = apiKey;
+                // Don't auto-fill the API key field for security
+                // The key will be used from localStorage when needed
             } else {
                 statusDiv.style.display = 'none';
                 statusDiv.classList.remove('connected');
@@ -904,7 +906,7 @@ EXPLANATION: AWS is Amazon's cloud platform.
         function disconnectBYOP() {
             if (confirm('Are you sure you want to disconnect your Pollinations account?')) {
                 localStorage.removeItem('pollinations_api_key');
-                document.getElementById('apiKey').value = '';
+                // Clear manual key field only if it matches the stored key
                 updateBYOPStatus();
             }
         }
@@ -1087,8 +1089,11 @@ Important rules:
                     }
                     inExplanation = false;
                 } else if (inExplanation && currentQuestion) {
-                    // Continue multi-line explanation
-                    currentQuestion.explanation += ' ' + line;
+                    // Continue multi-line explanation with proper spacing
+                    const trimmedLine = line.trim();
+                    if (trimmedLine) {
+                        currentQuestion.explanation += ' ' + trimmedLine;
+                    }
                 }
             }
             
