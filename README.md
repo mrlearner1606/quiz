@@ -26,15 +26,33 @@ This provides a **free alternative** to paid quiz platforms.
 
 ## Prerequisite (For AI Quiz Generation)
 
-To generate quizzes using AI, you need a **Pollinations API key**.
+To generate quizzes using AI, you have **two options**:
 
-### Create a Pollinations Account
+### Option 1: BYOP (Bring Your Own Pollen) - Recommended 🌸
+
+The easiest way to use AI quiz generation with **zero setup**:
+
+1. Click **"Connect with Pollinations"** in the app
+2. Sign in using your **GitHub account**
+3. Authorize the app (default: 10 pollen budget, 30-day expiry)
+4. You're ready to generate quizzes!
+
+**Benefits:**
+- ✅ No manual API key management
+- ✅ Pay only for what you use
+- ✅ Secure OAuth flow
+- ✅ Keys never exposed in server logs
+
+### Option 2: Manual API Key
+
+If you prefer to manage your own API key:
 
 1. Go to: **https://enter.pollinations.ai**
 2. Sign in using your **GitHub account**
 3. After login, copy your **API key**
+4. Enter it manually in the app
 
-> **Note:** This API key is required **only for AI-generated quizzes**.
+> **Note:** API keys are required **only for AI-generated quizzes**. Upload mode works without any API key.
 
 ---
 
@@ -53,13 +71,13 @@ This mode creates quizzes dynamically using AI.
 ### Steps
 
 1. Select **AI Generate Quiz**
-2. Enter:
-   - Pollinations API key
+2. **Connect via BYOP** (recommended) or enter your API key manually
+3. Enter:
    - Quiz topic (e.g., AWS, Python, SQL)
    - Number of questions
    - Difficulty level (Easy / Medium / Hard)
    - Timer duration (in minutes)
-3. Click **Generate Quiz**
+4. Click **Generate Quiz**
 
 ### Output
 
