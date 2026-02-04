@@ -116,6 +116,105 @@
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
         
+        .byop-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .byop-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .byop-description {
+            font-size: 14px;
+            opacity: 0.95;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .byop-connect-btn {
+            background: white;
+            color: #667eea;
+            padding: 12px 35px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .byop-connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .byop-status {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        
+        .byop-status.connected {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.4);
+        }
+        
+        .byop-disconnect-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 6px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+        
+        .byop-disconnect-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: #dee2e6;
+        }
+        
+        .divider-text {
+            background: white;
+            padding: 0 15px;
+            position: relative;
+            display: inline-block;
+            color: #6c757d;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
         .generate-btn {
             width: 100%;
             background: linear-gradient(90deg, #3498db 0%, #2c3e50 100%);
@@ -167,6 +266,28 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
         }
         
         .error-message {
@@ -548,6 +669,27 @@
             <!-- AI Generation Tab -->
             <div id="aiTab" class="tab-content active">
                 <div class="ai-form">
+                    <!-- BYOP Section -->
+                    <div class="byop-section">
+                        <div class="byop-title">
+                            🌸 Bring Your Own Pollen (BYOP)
+                        </div>
+                        <div class="byop-description">
+                            Pay for your own AI usage. No server costs. Self-regulating and secure.<br>
+                            <small style="opacity: 0.8;">Default: 10 pollen budget, 30-day expiry</small>
+                        </div>
+                        <button class="byop-connect-btn" id="byopConnectBtn" onclick="connectWithPollinations()">
+                            🔗 Connect with Pollinations
+                        </button>
+                        <div class="byop-status" id="byopStatus" style="display: none;">
+                            <div id="byopStatusText">✅ Connected</div>
+                        </div>
+                    </div>
+                    
+                    <div class="divider">
+                        <span class="divider-text">OR ENTER MANUALLY</span>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="apiKey">
 						  🔑 
@@ -557,7 +699,7 @@
 							 Pollinations API Key
 						  </a>
 						</label>
-                        <input type="password" id="apiKey" placeholder="Enter your API key">
+                        <input type="password" id="apiKey" placeholder="Enter your API key (optional if connected via BYOP)">
                     </div>
                     
                     <div class="form-group">
@@ -682,6 +824,96 @@ EXPLANATION: AWS is Amazon's cloud platform.
         let timerInterval;
         let userAnswers = {};
         
+        // BYOP Authentication Functions
+        function connectWithPollinations() {
+            const currentUrl = window.location.href.split('#')[0]; // Remove any existing hash
+            // Note: Budget is set to 10 pollen units. Users can manage their budget from the Pollinations dashboard.
+            const authUrl = `https://enter.pollinations.ai/authorize?redirect_url=${encodeURIComponent(currentUrl)}&permissions=profile,balance&models=openai,flux&expiry=30&budget=10`;
+            window.location.href = authUrl;
+        }
+        
+        function checkForApiKey() {
+            // Check URL hash for API key (BYOP flow)
+            const hash = window.location.hash.slice(1);
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                const apiKey = params.get('api_key');
+                if (apiKey) {
+                    // Store the API key
+                    localStorage.setItem('pollinations_api_key', apiKey);
+                    // Clear the hash from URL for security
+                    history.replaceState(null, null, window.location.pathname + window.location.search);
+                    updateBYOPStatus();
+                    // Show success message
+                    showSuccessMessage('Successfully connected to Pollinations! 🎉');
+                    return;
+                }
+            }
+            
+            // Check localStorage for existing key
+            updateBYOPStatus();
+        }
+        
+        function showSuccessMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                font-weight: 600;
+                animation: slideIn 0.3s ease-out;
+            `;
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+            setTimeout(() => {
+                messageDiv.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => messageDiv.remove(), 300);
+            }, 3000);
+        }
+        
+        function updateBYOPStatus() {
+            const apiKey = localStorage.getItem('pollinations_api_key');
+            const statusDiv = document.getElementById('byopStatus');
+            const statusText = document.getElementById('byopStatusText');
+            const connectBtn = document.getElementById('byopConnectBtn');
+            
+            if (apiKey) {
+                // Show connected status
+                statusDiv.style.display = 'block';
+                statusDiv.classList.add('connected');
+                const maskedKey = apiKey.substring(0, 6) + '...' + apiKey.substring(apiKey.length - 4);
+                statusText.innerHTML = `
+                    ✅ Connected with key: <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-size: 11px;">${maskedKey}</code>
+                    <button class="byop-disconnect-btn" onclick="disconnectBYOP()">Disconnect</button>
+                `;
+                connectBtn.textContent = '🔗 Reconnect';
+                
+                // Don't auto-fill the API key field for security
+                // The key will be used from localStorage when needed
+            } else {
+                statusDiv.style.display = 'none';
+                statusDiv.classList.remove('connected');
+                connectBtn.textContent = '🔗 Connect with Pollinations';
+            }
+        }
+        
+        function disconnectBYOP() {
+            if (confirm('Are you sure you want to disconnect your Pollinations account?')) {
+                localStorage.removeItem('pollinations_api_key');
+                // Clear manual key field only if it matches the stored key
+                updateBYOPStatus();
+            }
+        }
+        
+        // Check for API key on page load
+        window.addEventListener('DOMContentLoaded', checkForApiKey);
+        
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -696,7 +928,12 @@ EXPLANATION: AWS is Amazon's cloud platform.
         }
         
         async function generateQuiz() {
-            const apiKey = document.getElementById('apiKey').value.trim();
+            // Get API key from input or localStorage
+            let apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                apiKey = localStorage.getItem('pollinations_api_key');
+            }
+            
             const topic = document.getElementById('topic').value.trim();
             const numQuestions = document.getElementById('numQuestions').value;
             const difficulty = document.getElementById('difficulty').value;
@@ -704,7 +941,7 @@ EXPLANATION: AWS is Amazon's cloud platform.
             
             // Validation
             if (!apiKey) {
-                showError('Please enter your API key');
+                showError('Please connect with Pollinations or enter your API key manually');
                 return;
             }
             if (!topic) {
@@ -796,13 +1033,16 @@ Important rules:
         
         function parseQuizContent(content) {
             questions = [];
-            const lines = content.split('\n').filter(line => line.trim());
+            const lines = content.split('\n');
             
             let currentQuestion = null;
             let timerValue = 10;
+            let inExplanation = false;
             
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
+                
+                if (!line) continue; // Skip empty lines
                 
                 if (line.startsWith('TIMER:')) {
                     timerValue = parseInt(line.split(':')[1].trim()) || 10;
@@ -819,28 +1059,40 @@ Important rules:
                         userAnswer: null,
                         isCorrect: false
                     };
+                    inExplanation = false;
                 } else if (line.match(/^[A-D]\)/)) {
                     if (currentQuestion) {
                         const optionKey = line.charAt(0);
                         const optionValue = line.substring(2).trim();
                         currentQuestion.options[optionKey] = optionValue;
                     }
+                    inExplanation = false;
                 } else if (line.startsWith('TYPE:')) {
                     if (currentQuestion) {
                         currentQuestion.type = line.substring(5).trim();
                     }
+                    inExplanation = false;
                 } else if (line.startsWith('ANSWER:')) {
                     if (currentQuestion) {
                         currentQuestion.answer = line.substring(7).trim();
                     }
+                    inExplanation = false;
                 } else if (line.startsWith('EXPLANATION:')) {
                     if (currentQuestion) {
                         currentQuestion.explanation = line.substring(12).trim();
+                        inExplanation = true;
                     }
                 } else if (line === '===END===') {
                     if (currentQuestion) {
                         questions.push(currentQuestion);
                         currentQuestion = null;
+                    }
+                    inExplanation = false;
+                } else if (inExplanation && currentQuestion) {
+                    // Continue multi-line explanation with proper spacing
+                    const trimmedLine = line.trim();
+                    if (trimmedLine) {
+                        currentQuestion.explanation += ' ' + trimmedLine;
                     }
                 }
             }
@@ -891,6 +1143,9 @@ Important rules:
         function startTimer() {
             const timerMinutes = window.quizTimerMinutes || 10;
             let timeLeft = timerMinutes * 60;
+            
+            // Remove any existing timer warning class
+            document.getElementById('timerDisplay').classList.remove('timer-warning');
             
             timerInterval = setInterval(() => {
                 timeLeft--;
@@ -1087,7 +1342,7 @@ Important rules:
                         <div class="answer-details">
                             ${correctAnswerDisplay}
                             <div style="margin-top: 6px; padding: 6px; background: #e3f2fd; border-radius: 5px; font-size: 12px;">
-                                💡 ${q.explanation.substring(0, 80)}...
+                                💡 ${q.explanation.length > 120 ? q.explanation.substring(0, 120) + '...' : q.explanation}
                             </div>
                         </div>
                     </td>
@@ -1115,6 +1370,7 @@ Important rules:
             clearInterval(timerInterval);
             currentQuestionIndex = 0;
             score = 0;
+            document.getElementById('timerDisplay').classList.remove('timer-warning');
             questions.forEach(q => {
                 q.userAnswer = null;
                 q.isCorrect = false;
