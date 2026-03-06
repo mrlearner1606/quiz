@@ -699,7 +699,7 @@
 							 Pollinations API Key
 						  </a>
 						</label>
-                        <input type="password" id="apiKey" placeholder="Enter your API key (Make sure the API key has access to openai-large model)">
+                        <input type="password" id="apiKey" placeholder="Enter your API key (Make sure the API key has access to kimi model)">
                     </div>
                     
                     <div class="form-group">
@@ -828,7 +828,7 @@ EXPLANATION: AWS is Amazon's cloud platform.
         function connectWithPollinations() {
             const currentUrl = window.location.href.split('#')[0]; // Remove any existing hash
             // Note: Budget is set to 10 pollen units. Users can manage their budget from the Pollinations dashboard.
-            const authUrl = `https://enter.pollinations.ai/authorize?redirect_url=${encodeURIComponent(currentUrl)}&permissions=profile,balance&models=openai-large,flux&expiry=30&budget=10`;
+            const authUrl = `https://enter.pollinations.ai/authorize?redirect_url=${encodeURIComponent(currentUrl)}&permissions=profile,balance&models=kimi,flux&expiry=30&budget=10`;
             window.location.href = authUrl;
         }
         
@@ -986,7 +986,7 @@ Important rules:
                 // Use Claude Sonnet 4.5 for better reasoning
                 const url = `https://gen.pollinations.ai/text/${encodeURIComponent(prompt)}`;
                 const params = new URLSearchParams({
-                    model: 'openai-large',
+                    model: 'kimi',
                     key: apiKey,
                     system: systemPrompt,
                 });
@@ -1378,4 +1378,5 @@ Important rules:
         }
     </script>
 </body>
+
 </html>
